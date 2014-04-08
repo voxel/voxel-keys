@@ -35,14 +35,34 @@ KeysPlugin.prototype.getBindingName = function(code) {
 };
 
 KeysPlugin.prototype.enable = function() {
-  document.body.addEventListener('keydown', this.onKeyDown = this.keyDown.bind(this));
-  document.body.addEventListener('keyup', this.onKeyUp = this.keyUp.bind(this));
+  var self = this;
+
+  // TODO: compatibility with game-shell, .pointerLock property instead of events
+  this.game.interact.on('attain', this.onAttain = function() {
+    self.activate(true);
+  });
+  this.game.interact.on('release', this.onRelease = function() {
+    self.activate(false);
+  });
 };
 
 KeysPlugin.prototype.disable = function() {
-  document.body.removeEventListener('keydown', this.onKeyDown);
-  document.body.removeEventListener('keyup', this.onKeyUp);
+  this.activate(false);
+  this.game.interact.removeListener('attain', this.onAttain);
+  this.game.interact.removeListener('release', this.onRelease);
 };
+
+KeysPlugin.prototype.activate = function(flag) {
+  if (flag) {
+    document.body.addEventListener('keydown', this.onKeyDown = this.keyDown.bind(this));
+    document.body.addEventListener('keyup', this.onKeyUp = this.keyUp.bind(this));
+  } else {
+    document.body.removeEventListener('keydown', this.onKeyDown);
+    document.body.removeEventListener('keyup', this.onKeyUp);
+    this.states = {};
+  }
+};
+
 
 KeysPlugin.prototype.keyDown = function(ev) {
   var code = ev.keyCode; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
