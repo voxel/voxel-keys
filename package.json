@@ -1,0 +1,17 @@
+{
+  "name": "voxel-keys",
+  "description": "",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:deathcap/voxel-keys.git"
+  },
+  "keywords": [
+    "voxel"
+  ],
+  "dependencies": {
+  },
+  "peerDependencies": {
+  },
+  "license": "MIT"
+}
