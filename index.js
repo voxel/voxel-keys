@@ -7,6 +7,9 @@ var inherits = require('inherits');
 module.exports = function(game, opts) {
   return new KeysPlugin(game, opts);
 };
+module.exports.pluginInfo = {
+  clientOnly: true // TODO: server-based keybindings? send keys to server, have it tell client what to do?
+};
 
 function KeysPlugin(game, opts) {
   this.game = game;
