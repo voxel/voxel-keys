@@ -48,7 +48,7 @@ KeysPlugin.prototype.keyDown = function(ev) {
   var code = ev.keyCode; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
 
   // released -> pressed
-  if (this.states[code] === 0) {
+  if (!this.states[code]) {
     var binding = this.getBindingName(code);
     if (binding) {
       this.down.emit(binding);
