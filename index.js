@@ -9,6 +9,9 @@ module.exports = function(game, opts) {
 };
 
 function KeysPlugin(game, opts) {
+  this.game = game;
+  if (!this.game.buttons || !this.game.buttons.bindings) throw new Error('voxel-keys requires game.buttons as kb-bindings with game.buttons.bindings'); // TODO: game-shell
+
   this.states = {};
 
   this.down = new EventEmitter();
@@ -17,6 +20,16 @@ function KeysPlugin(game, opts) {
 
   this.enable();
 }
+
+// get bound name of pressed key from event, or undefined if none
+KeysPlugin.prototype.getBindingName = function(code) {
+  var key = vkey[code];
+  if (key === undefined) return undefined;
+
+  var bindingName = this.game.buttons.bindings[key]; // TODO: game-shell, inverse lookup
+
+  return bindingName;
+};
 
 KeysPlugin.prototype.enable = function() {
   document.body.addEventListener('keydown', this.onKeyDown = this.keyDown.bind(this));
@@ -29,22 +42,26 @@ KeysPlugin.prototype.disable = function() {
 };
 
 KeysPlugin.prototype.keyDown = function(ev) {
-  var key = vkey[ev.keyCode]; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
+  var code = ev.keyCode; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
 
-  if (this.states[key] === 0) {
-    this.down.emit(key); // TODO: emit binding not key
+  // released -> pressed
+  if (this.states[code] === 0) {
+    var binding = this.getBindingName(code);
+    if (binding) this.down.emit(binding);
   }
 
-  this.states[key] += 1; // TODO: use bindings for state instead of key?
+  this.states[code] += 1;
 };
 
 KeysPlugin.prototype.keyUp = function(ev) {
-  var key = vkey[ev.keyCode];
+  var code = ev.keyCode;
 
-  if (this.states[key] !== 0) {
-    this.up.emit(key);
+  // pressed -> released
+  if (this.states[code] !== 0) {
+    var binding = this.getBindingName(code);
+    if (binding) this.up.emit(binding);
   }
 
-  this.states[key] = 0;
+  this.states[code] = 0;
 };
 
