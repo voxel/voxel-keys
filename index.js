@@ -16,7 +16,7 @@ function KeysPlugin(game, opts) {
 
   this.down = new EventEmitter();
   this.up = new EventEmitter();
-  this.changed = new EventEmitter(); // TODO
+  this.changed = new EventEmitter();
 
   this.enable();
 }
@@ -47,7 +47,10 @@ KeysPlugin.prototype.keyDown = function(ev) {
   // released -> pressed
   if (this.states[code] === 0) {
     var binding = this.getBindingName(code);
-    if (binding) this.down.emit(binding);
+    if (binding) {
+      this.down.emit(binding);
+      this.changed.emit(binding);
+    }
   }
 
   this.states[code] += 1;
@@ -59,7 +62,10 @@ KeysPlugin.prototype.keyUp = function(ev) {
   // pressed -> released
   if (this.states[code] !== 0) {
     var binding = this.getBindingName(code);
-    if (binding) this.up.emit(binding);
+    if (binding) {
+      this.up.emit(binding);
+      this.changed.emit(binding);
+    }
   }
 
   this.states[code] = 0;
