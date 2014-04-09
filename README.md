@@ -10,7 +10,8 @@ Use with [voxel-plugins](https://github.com/deathcap/voxel-plugins):
         console.log('the key corresponding to the left keybinding was pressed');
     });
 
-Currently requires [kb-bindings](https://github.com/deathcap/kb-bindings).
+Supports either [kb-bindings](https://github.com/deathcap/kb-bindings) or
+[game-shell](https://github.com/mikolalysenko/game-shell).
 
 Three event emitters are available on the plugin instance: `down`, `up`, and `changed`.
 All emit events corresponding to the name of the keybinding (not the key name itself,

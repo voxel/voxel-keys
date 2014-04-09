@@ -13,7 +13,13 @@ module.exports.pluginInfo = {
 
 function KeysPlugin(game, opts) {
   this.game = game;
-  if (!this.game.buttons || !this.game.buttons.bindings) throw new Error('voxel-keys requires game.buttons as kb-bindings with game.buttons.bindings'); // TODO: game-shell
+  if (this.game.buttons && this.game.buttons.bindings) {
+    this.getBindingName = this.getBindingNameKB;
+  } else if (this.game.shell && this.game.shell.bindings) {
+    this.getBindingName = this.getBindingNameGS;
+  } else {
+    throw new Error('voxel-keys requires either kb-bindings or game-shell');
+  }
 
   this.states = {};
 
@@ -25,25 +31,45 @@ function KeysPlugin(game, opts) {
 }
 
 // get bound name of pressed key from event, or undefined if none
-KeysPlugin.prototype.getBindingName = function(code) {
+
+// for kb-bindings
+KeysPlugin.prototype.getBindingNameKB = function(code) {
   var key = vkey[code];
   if (key === undefined) return undefined;
 
-  var bindingName = this.game.buttons.bindings[key]; // TODO: game-shell, inverse lookup
+  var bindingName = this.game.buttons.bindings[key];
 
   return bindingName;
+};
+
+// for game-shell
+KeysPlugin.prototype.getBindingNameGS = function(code) {
+  var key = vkey[code];
+  if (key === undefined) return undefined;
+
+  // TODO: optimize inverse lookup, cache?
+  for (var bindingName in this.game.shell.bindings) {
+    if (this.game.shell.bindings[bindingName].indexOf(key) !== -1) {
+      return bindingName;
+    }
+  }
 };
 
 KeysPlugin.prototype.enable = function() {
   var self = this;
 
-  // TODO: compatibility with game-shell, .pointerLock property instead of events
-  this.game.interact.on('attain', this.onAttain = function() {
+  if (this.game.interact) {
+    // voxel-engine interact module, controls pointer lock
+    this.game.interact.on('attain', this.onAttain = function() {
+      self.activate(true);
+    });
+    this.game.interact.on('release', this.onRelease = function() {
+      self.activate(false);
+    });
+  } else {
+    // when game-shell, always listen and check .pointerLock property
     self.activate(true);
-  });
-  this.game.interact.on('release', this.onRelease = function() {
-    self.activate(false);
-  });
+  }
 };
 
 KeysPlugin.prototype.disable = function() {
@@ -65,6 +91,8 @@ KeysPlugin.prototype.activate = function(flag) {
 
 
 KeysPlugin.prototype.keyDown = function(ev) {
+  if (this.game.shell && !this.game.shell.pointerLock) return; // game-shell pointer lock not acquired
+
   var code = ev.keyCode; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
 
   // released -> pressed
@@ -80,6 +108,8 @@ KeysPlugin.prototype.keyDown = function(ev) {
 };
 
 KeysPlugin.prototype.keyUp = function(ev) {
+  if (this.game.shell && !this.game.shell.pointerLock) return;
+
   var code = ev.keyCode;
 
   // pressed -> released
