@@ -2,6 +2,7 @@
   "name": "voxel-keys",
   "description": "events for key bindings (voxel.js plugin)",
   "version": "0.0.1",
+  "main": "keys.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:deathcap/voxel-keys.git"
