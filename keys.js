@@ -22,6 +22,7 @@ function KeysPlugin(game, opts) {
   }
 
   this.states = {};
+  this.isActive = false;
 
   this.down = new EventEmitter();
   this.up = new EventEmitter();
@@ -79,13 +80,16 @@ KeysPlugin.prototype.disable = function() {
 };
 
 KeysPlugin.prototype.activate = function(flag) {
-  if (flag) {
-    document.body.addEventListener('keydown', this.onKeyDown = this.keyDown.bind(this));
-    document.body.addEventListener('keyup', this.onKeyUp = this.keyUp.bind(this));
-  } else {
-    document.body.removeEventListener('keydown', this.onKeyDown);
-    document.body.removeEventListener('keyup', this.onKeyUp);
-    this.states = {};
+  if (this.isActive ^ flag) {
+    if (flag) {
+      document.body.addEventListener('keydown', this.onKeyDown = this.keyDown.bind(this));
+      document.body.addEventListener('keyup', this.onKeyUp = this.keyUp.bind(this));
+    } else {
+      document.body.removeEventListener('keydown', this.onKeyDown);
+      document.body.removeEventListener('keyup', this.onKeyUp);
+      this.states = {};
+    }
+    this.isActive = flag;
   }
 };
 
