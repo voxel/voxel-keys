@@ -24,6 +24,8 @@ function KeysPlugin(game, opts) {
   this.states = {};
   this.isActive = false;
 
+  this.alwaysPreventDefault = opts.alwaysPreventDefault !== undefined ? opts.alwaysPreventDefault : true;
+
   this.down = new EventEmitter();
   this.up = new EventEmitter();
   this.changed = new EventEmitter();
@@ -97,6 +99,8 @@ KeysPlugin.prototype.activate = function(flag) {
 KeysPlugin.prototype.keyDown = function(ev) {
   if (this.game.shell && !this.game.shell.pointerLock) return; // game-shell pointer lock not acquired
 
+  if (this.alwaysPreventDefault) ev.preventDefault();
+
   var code = ev.keyCode; // TODO: keyCode is deprecated in favor of (unimplemented) key, according to https://developer.mozilla.org/en-US/docs/Web/Reference/Events/keydown
 
   // released -> pressed
@@ -113,6 +117,8 @@ KeysPlugin.prototype.keyDown = function(ev) {
 
 KeysPlugin.prototype.keyUp = function(ev) {
   if (this.game.shell && !this.game.shell.pointerLock) return;
+
+  if (this.alwaysPreventDefault) ev.preventDefault();
 
   var code = ev.keyCode;
 
