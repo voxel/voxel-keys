@@ -25,6 +25,7 @@ function KeysPlugin(game, opts) {
   this.isActive = false;
 
   this.preventDefaultKeys = opts.preventDefaultKeys !== undefined ? opts.preventDefaultKeys : true;
+  this.preventDefaultContext = opts.preventDefaultContext !== undefined ? opts.preventDefaultContext : true;
 
   this.down = new EventEmitter();
   this.up = new EventEmitter();
@@ -75,9 +76,16 @@ KeysPlugin.prototype.enable = function() {
   } else {
     throw new Error('voxel-keys could not enable, have neither game.shell nor game.interact');
   }
+
+  if (this.preventDefaultContext) {
+    document.body.addEventListener('contextmenu', this.onContextMenu = function(ev) {
+      ev.preventDefault();
+    });
+  }
 };
 
 KeysPlugin.prototype.disable = function() {
+  if (this.preventDefaultContext) document.body.removeEventListener('contextMenu', this.onContextMenu);
   this.activate(false);
   this.game.interact.removeListener('attain', this.onAttain);
   this.game.interact.removeListener('release', this.onRelease);
