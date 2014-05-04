@@ -13,10 +13,10 @@ module.exports.pluginInfo = {
 
 function KeysPlugin(game, opts) {
   this.game = game;
-  if (this.game.buttons && this.game.buttons.bindings) {
-    this.getBindingName = this.getBindingNameKB;
-  } else if (this.game.shell && this.game.shell.bindings) {
+  if (this.game.shell && this.game.shell.bindings) {
     this.getBindingName = this.getBindingNameGS;
+  } else if (this.game.buttons && this.game.buttons.bindings) {
+    this.getBindingName = this.getBindingNameKB;
   } else {
     throw new Error('voxel-keys requires either kb-bindings or game-shell');
   }
@@ -61,7 +61,10 @@ KeysPlugin.prototype.getBindingNameGS = function(code) {
 KeysPlugin.prototype.enable = function() {
   var self = this;
 
-  if (this.game.interact) {
+  if (this.game.shell) {
+    // when game-shell, always listen and check .pointerLock property
+    self.activate(true);
+  } else if (this.game.interact) {
     // voxel-engine interact module, controls pointer lock
     this.game.interact.on('attain', this.onAttain = function() {
       self.activate(true);
@@ -70,8 +73,7 @@ KeysPlugin.prototype.enable = function() {
       self.activate(false);
     });
   } else {
-    // when game-shell, always listen and check .pointerLock property
-    self.activate(true);
+    throw new Error('voxel-keys could not enable, have neither game.shell nor game.interact');
   }
 };
 
