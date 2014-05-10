@@ -87,8 +87,10 @@ KeysPlugin.prototype.enable = function() {
 KeysPlugin.prototype.disable = function() {
   if (this.preventDefaultContext) document.body.removeEventListener('contextMenu', this.onContextMenu);
   this.activate(false);
-  this.game.interact.removeListener('attain', this.onAttain);
-  this.game.interact.removeListener('release', this.onRelease);
+  if (!this.game.shell && this.game.interact) {
+    this.game.interact.removeListener('attain', this.onAttain);
+    this.game.interact.removeListener('release', this.onRelease);
+  }
 };
 
 KeysPlugin.prototype.activate = function(flag) {
