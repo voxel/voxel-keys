@@ -19,6 +19,13 @@ but the descriptive name, for example "left" for "A", if using FPS-style WASD mo
 The events are only emitted when the state changes from up to down, or down to up
 (*not* continuously while pressed, unlike the DOM keypress event).
 
+When used with game-shell, an additional API is available to add default keybindings:
+
+    keys.registerKey('left', 'A');
+
+will bind `left` to `A` if there is no existing binding for `left`. Without game-shell,
+default keybindings are instead defined statically with the `keybindings` option to voxel-engine.
+
 ## License
 
 MIT

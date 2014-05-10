@@ -34,6 +34,22 @@ function KeysPlugin(game, opts) {
   this.enable();
 }
 
+KeysPlugin.prototype.registerKey = function(name, defaultKey) {
+  if (!this.game.shell) return; // no-op; requires static assignment
+
+  // if no key is bound for this name, bind it (allow customization -
+  // this call only provides a default if none is present)
+  if (!(name in this.game.shell.bindings)) {
+    this.game.shell.bind(name, defaultKey);
+  }
+};
+
+KeysPlugin.prototype.unregisterKey = function(name) {
+  if (!this.game.shell) return;
+
+  this.game.shell.unbind(name); // TODO: only remove default key? something else might use this binding?
+};
+
 // get bound name of pressed key from event, or undefined if none
 
 // for kb-bindings
