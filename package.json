@@ -1,7 +1,7 @@
 {
   "name": "voxel-keys",
   "description": "events for key bindings (voxel.js plugin)",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "keys.js",
   "repository": {
     "type": "git",
