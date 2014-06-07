@@ -34,6 +34,16 @@ function KeysPlugin(game, opts) {
   this.enable();
 }
 
+// cleanup key name - based on https://github.com/mikolalysenko/game-shell/blob/master/shell.js
+// and also in voxel-engine TODO: refactor with those
+var filtered_vkey = function(k) {
+  if(k.charAt(0) === '<' && k.charAt(k.length-1) === '>') {
+    k = k.substring(1, k.length-1)
+  }
+  k = k.replace(/\s/g, "-")
+  return k
+}
+
 KeysPlugin.prototype.registerKey = function(name, defaultKey) {
   if (!this.game.shell) return; // no-op; requires static assignment
 
@@ -66,6 +76,8 @@ KeysPlugin.prototype.getBindingNameKB = function(code) {
 KeysPlugin.prototype.getBindingNameGS = function(code) {
   var key = vkey[code];
   if (key === undefined) return undefined;
+
+  key = filtered_vkey(key);
 
   // TODO: optimize inverse lookup, cache?
   for (var bindingName in this.game.shell.bindings) {
