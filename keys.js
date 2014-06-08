@@ -3,6 +3,7 @@
 var vkey = require('vkey');
 var EventEmitter = require('events').EventEmitter;
 var inherits = require('inherits');
+var toArray = require('toarray');
 
 module.exports = function(game, opts) {
   return new KeysPlugin(game, opts);
@@ -14,9 +15,9 @@ module.exports.pluginInfo = {
 function KeysPlugin(game, opts) {
   this.game = game;
   if (this.game.shell && this.game.shell.bindings) {
-    this.getBindingName = this.getBindingNameGS;
+    this.getBindingsNames = this.getBindingsNamesGS;
   } else if (this.game.buttons && this.game.buttons.bindings) {
-    this.getBindingName = this.getBindingNameKB;
+    this.getBindingsNames = this.getBindingsNamesKB;
   } else {
     throw new Error('voxel-keys requires either kb-bindings or game-shell');
   }
@@ -63,17 +64,18 @@ KeysPlugin.prototype.unregisterKey = function(name) {
 // get bound name of pressed key from event, or undefined if none
 
 // for kb-bindings
-KeysPlugin.prototype.getBindingNameKB = function(code) {
+KeysPlugin.prototype.getBindingsNamesKB = function(code) {
   var key = vkey[code];
   if (key === undefined) return undefined;
 
   var bindingName = this.game.buttons.bindings[key];
 
-  return bindingName;
+  return toarray(bindingName);
 };
 
 // for game-shell
-KeysPlugin.prototype.getBindingNameGS = function(code) {
+KeysPlugin.prototype.getBindingsNamesGS = function(code) {
+  var found = [];
   var key = vkey[code];
   if (key === undefined) return undefined;
 
@@ -82,9 +84,10 @@ KeysPlugin.prototype.getBindingNameGS = function(code) {
   // TODO: optimize inverse lookup, cache?
   for (var bindingName in this.game.shell.bindings) {
     if (this.game.shell.bindings[bindingName].indexOf(key) !== -1) {
-      return bindingName;
+      found.push(bindingName);
     }
   }
+  return found;
 };
 
 KeysPlugin.prototype.enable = function() {
@@ -145,8 +148,10 @@ KeysPlugin.prototype.keyDown = function(ev) {
 
   // released -> pressed
   if (!this.states[code]) {
-    var binding = this.getBindingName(code);
-    if (binding) {
+    var bindings = this.getBindingsNames(code);
+    for (var i = 0; i < bindings.length; i += 1) {
+      var binding = bindings[i];
+
       this.down.emit(binding, ev);
       this.changed.emit(binding, ev);
     }
@@ -164,8 +169,10 @@ KeysPlugin.prototype.keyUp = function(ev) {
 
   // pressed -> released
   if (this.states[code] !== 0) {
-    var binding = this.getBindingName(code);
-    if (binding) {
+    var bindings = this.getBindingsNames(code);
+    for (var i = 0; i < bindings.length; i += 1) {
+      var binding = bindings[i];
+
       this.up.emit(binding, ev);
       this.changed.emit(binding, ev);
     }
