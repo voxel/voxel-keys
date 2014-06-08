@@ -147,8 +147,8 @@ KeysPlugin.prototype.keyDown = function(ev) {
   if (!this.states[code]) {
     var binding = this.getBindingName(code);
     if (binding) {
-      this.down.emit(binding);
-      this.changed.emit(binding);
+      this.down.emit(binding, ev);
+      this.changed.emit(binding, ev);
     }
   }
 
@@ -166,8 +166,8 @@ KeysPlugin.prototype.keyUp = function(ev) {
   if (this.states[code] !== 0) {
     var binding = this.getBindingName(code);
     if (binding) {
-      this.up.emit(binding);
-      this.changed.emit(binding);
+      this.up.emit(binding, ev);
+      this.changed.emit(binding, ev);
     }
   }
 
