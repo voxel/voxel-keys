@@ -70,7 +70,7 @@ KeysPlugin.prototype.getBindingsNamesKB = function(code) {
 
   var bindingName = this.game.buttons.bindings[key];
 
-  return toarray(bindingName);
+  return toArray(bindingName);
 };
 
 // for game-shell
